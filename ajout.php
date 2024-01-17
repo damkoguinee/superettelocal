@@ -287,17 +287,20 @@ if (isset($_SESSION['pseudo'])) {
                 $prodm=$DB->query("SELECT *from productslist where codecat='{$_SESSION['design']}' order by(pventel)");
               }else{
 
-                $prodm=$DB->query('SELECT *from productslist order by(pventel)');
+                $prodm=$DB->query('SELECT *from productslist order by(id) desc');
 
               }
             }
 
           }
 
-          if (!isset($_GET['resultidprod'])) {
+          if (isset($_GET['resultidprod'])) {
 
-            //$prodm=$DB->query("SELECT *from productslist where id='{$_GET['resultidprod']}' ");
-            $prodm=$DB->query("SELECT *from productslist ");
+            $prodm=$DB->query("SELECT *from productslist where id='{$_GET['resultidprod']}' ");
+          }
+          if (isset($_GET['delete'])) {
+
+            $prodm=$DB->query("SELECT *from productslist where codecat='{$_SESSION['design']}' ");
           }?>
               
           <table class="payement">
