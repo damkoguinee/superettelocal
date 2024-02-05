@@ -29,8 +29,12 @@ if (isset($_GET['deletevers'])) {
   $pri=$qtiteiniti['pr'];
 
   $qtiteaug=$qtiteiniti['quantite']-$qtitesup;
-
-  $prmoyen=$panier->espace(number_format(((($qtiteinit*$pri)-($prodcmd['quantite']*$prodcmd['pr']))/(($qtiteinit-$prodcmd['quantite']))),0,',','')); 
+  
+  if (($qtiteinit-$prodcmd['quantite']) == 0) {
+    $prmoyen = $pri;
+  }else{
+    $prmoyen=$panier->espace(number_format(((($qtiteinit*$pri)-($prodcmd['quantite']*$prodcmd['pr']))/(($qtiteinit-$prodcmd['quantite']))),0,',','')); 
+  }
 
   $DB->insert("UPDATE `".$nomtabdep."` SET quantite = ?, prix_revient=? WHERE idprod= ?", array($qtiteaug, $prmoyen, $numero));
 

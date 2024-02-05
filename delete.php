@@ -150,6 +150,22 @@ if (isset($_POST['num_cmd']) or isset($_GET['num_cmd'])) {
       }
     }
 
+    $prodcmd=$DB->query("SELECT *FROM commande WHERE num_cmd='{$numero}'");
+
+    $prodpaie=$DB->querys("SELECT *FROM payement WHERE num_cmd='{$numero}'");
+  
+    $idstockdel=$prodpaie['lieuvente'];
+    $totalsup=$prodpaie['Total'];
+  
+    $montantsup=$prodpaie['montantpaye'];
+  
+    $remise=$prodpaie['remise'];
+  
+    foreach ($prodcmd as $valuec) {
+  
+      $DB->insert('INSERT INTO ventedelete (id_produit, prix_vente, prix_revient, quantity, num_cmd, id_client, idpersonnel, idstock, datedelete) VALUES(?, ?, ?, ?, ?, ?, ?, ?, now())', array($valuec->id_produit, $valuec->prix_vente, $valuec->prix_revient, $valuec->quantity, $valuec->num_cmd, $valuec->id_client, $_SESSION['idpseudo'], $idstockdel));
+    }
+
   $DB->delete('DELETE FROM payement WHERE num_cmd = ?', array($numero));
 
   $DB->delete('DELETE FROM bulletin WHERE numero = ?', array($numero));
