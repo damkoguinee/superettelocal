@@ -26,6 +26,7 @@ $_SESSION['idpseudo']=$connexion['id'];
 $_SESSION['idcpseudo']=$client['id'];
 $_SESSION['statut']=$connexion['statut'];
 $_SESSION['level']=$connexion['level'];
+$_SESSION['user'] = $connexion;
 
 $caisse = $DB->querys('SELECT * FROM nombanque WHERE lieuvente =? and type=?', 
 	array($_SESSION['lieuvente'], 'caisse'));

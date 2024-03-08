@@ -51,6 +51,10 @@ if (isset($_POST['num_cmd']) or isset($_GET['num_cmd'])) {
       $quantite=$prodmouv['quantitemouv']+$qtitel;
     
       $DB->insert("UPDATE stockmouv SET quantitemouv ='{$quantite}' WHERE idstock ='{$designation}' and numeromouv='{$numeroup}' and idnomstock='{$idstock}'" );
+
+      $numeroup='ouvc'.$numero;
+
+      $DB->insert("UPDATE stockmouv SET quantitemouv ='{$quantite}' WHERE idstock ='{$designation}' and numeromouv='{$numeroup}' and idnomstock='{$idstock}'" );
       
     }
 
@@ -92,13 +96,21 @@ if (isset($_POST['num_cmd']) or isset($_GET['num_cmd'])) {
         $moyens=$qtite-$qtiteint;
 
 
-        if ($reste>0) {
+        if ($reste>=0) {
 
           $DB->insert("UPDATE `".$nomtab."`  SET quantite ='{$plus}' WHERE idprod='{$idcarton}' ");
 
           $type='detail';
 
           $DB->insert("UPDATE `".$nomtab."` SET quantite ='{$moyens}' WHERE idprod='{$designation}' and type='{$type}'");
+
+          // cette partie rajouté
+          $numeroup='liv'.$numero;          
+          $numeroup='ouvc'.$numero;
+          $qtite_int_carton = 0; // pour retirer dans le mouvement stock si detail = qtite int detail
+          $libelle = 'entree';
+
+          $DB->insert("UPDATE stockmouv SET quantitemouv ='{$qtite_int_carton}', libelle = '{$libelle}' WHERE idstock ='{$idcarton}' and numeromouv='{$numeroup}' and idnomstock='{$idstock}'" );
         }
       }
       
@@ -139,13 +151,21 @@ if (isset($_POST['num_cmd']) or isset($_GET['num_cmd'])) {
         $moyens=$qtite-$qtiteint;
 
 
-        if ($reste>0) {
+        if ($reste>=0) {
 
           $DB->insert("UPDATE `".$nomtab."` SET quantite ='{$plus}' WHERE idprod='{$idcarton}'");
 
           $type='paquet';
 
           $DB->insert("UPDATE `".$nomtab."` SET quantite ='{$moyens}' WHERE idprod='{$designation}' and type='{$type}'");
+
+          // cette partie rajouté
+          $numeroup='liv'.$numero;          
+          $numeroup='ouvc'.$numero;
+          $qtite_int_carton = 0; // pour retirer dans le mouvement stock si detail = qtite int detail
+          $libelle = 'entree';
+
+          $DB->insert("UPDATE stockmouv SET quantitemouv ='{$qtite_int_carton}', libelle = '{$libelle}' WHERE idstock ='{$idcarton}' and numeromouv='{$numeroup}' and idnomstock='{$idstock}'" );
         }
       }
     }

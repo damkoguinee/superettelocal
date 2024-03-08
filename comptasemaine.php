@@ -1147,7 +1147,11 @@ if (isset($_SESSION['pseudo'])) {
 
             <td style="text-align: right"  ><?= number_format($product->prix_vente*$product->quantity,0,',',' '); ?></td>
             
-            <td style="text-align: right"  ><?= number_format($product->prix_vente*$product->quantity-$product->prix_revient*$product->quantity,0,',',' '); ?></td>
+            <td style="text-align: right"  >
+              <?php if ($_SESSION['level']>6) {?>
+                <?= number_format($product->prix_vente*$product->quantity-$product->prix_revient*$product->quantity,0,',',' '); ?><?php 
+              }?>
+            </td>
             <td><?= $product->DateTemps; ?></td>
             <td><?= $product->etat; ?></td>
             <td><?= $client; ?></td>
@@ -1166,7 +1170,10 @@ if (isset($_SESSION['pseudo'])) {
 
             <th style="text-align: right;"><?= number_format($cumulmontantotc,0,',',' ');?></th>
             
-            <th style="text-align: right;"><?= number_format($cumulmontantotc-$cumulrevient,0,',',' ');?></th>
+            <th style="text-align: right;"><?php if ($_SESSION['level']>6) {?>
+              <?= number_format($cumulmontantotc-$cumulrevient,0,',',' ');?><?php 
+            }?>
+            </th>
           </tr>
         </tfoot>
 

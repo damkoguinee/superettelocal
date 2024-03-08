@@ -1,4 +1,4 @@
-<?php require 'header.php';
+<?php require 'headerv2.php';
 
 if (isset($_SESSION['pseudo'])) {
 
@@ -18,496 +18,534 @@ if (isset($_SESSION['pseudo'])) {
     PRIMARY KEY (`id`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ");
 
-  $pseudo=$_SESSION['pseudo'];
+  ?>
+  <div class="container-fluid my-1">
+    <div class="row"><?php
+      require 'navfournisseur.php';?>
+      <div class="col-sm-12 col-md-10"><?php  
 
-  require 'navversement.php'; 
-  
+        if ($_SESSION['level']>=3) {
 
-  if ($_SESSION['level']>=3) {
+          if (!isset($_POST['magasin'])) {
 
-    if (!isset($_POST['magasin'])) {
+            if (!isset($_POST['j1'])) {
 
-      if (!isset($_POST['j1'])) {
+              $_SESSION['date']=date("Ymd");  
+              $dates = $_SESSION['date'];
+              $dates = new DateTime( $dates );
+              $dates = $dates->format('Ymd'); 
+              $_SESSION['date']=$dates;
+              $_SESSION['date1']=$dates;
+              $_SESSION['date2']=$dates;
+              $_SESSION['dates1']=$dates; 
 
-        $_SESSION['date']=date("Ymd");  
-        $dates = $_SESSION['date'];
-        $dates = new DateTime( $dates );
-        $dates = $dates->format('Ymd'); 
-        $_SESSION['date']=$dates;
-        $_SESSION['date1']=$dates;
-        $_SESSION['date2']=$dates;
-        $_SESSION['dates1']=$dates; 
+            }else{
 
-      }else{
-
-        $_SESSION['date01']=$_POST['j1'];
-        $_SESSION['date1'] = new DateTime($_SESSION['date01']);
-        $_SESSION['date1'] = $_SESSION['date1']->format('Ymd');
-        
-        $_SESSION['date02']=$_POST['j2'];
-        $_SESSION['date2'] = new DateTime($_SESSION['date02']);
-        $_SESSION['date2'] = $_SESSION['date2']->format('Ymd');
-
-        $_SESSION['dates1']=(new DateTime($_SESSION['date01']))->format('d/m/Y');
-        $_SESSION['dates2']=(new DateTime($_SESSION['date02']))->format('d/m/Y');  
-      }
-    }
-
-    if (isset($_POST['j2'])) {
-
-      $datenormale='entre le '.$_SESSION['dates1'].' et le '.$_SESSION['dates2'];
-
-    }else{
-
-      $datenormale=(new DateTime($_SESSION['date']))->format('d/m/Y');
-    }
-
-    if (isset($_POST['clientliv'])) {
-      $_SESSION['clientliv']=$_POST['clientliv'];
-    }
-
-
-    if (isset($_GET['deleteret'])) {
-
-      $DB->delete("DELETE from editionfournisseur where numedit='{$_GET['deleteret']}'");
-
-      $DB->delete("DELETE from bulletin where numero='{$_GET['deleteret']}'");?>
-
-      <div class="alerteV">Suppression reussie!!</div><?php 
-    }
-
-
-    if (isset($_POST["valid"])) {
-
-      if (empty($_POST["client"]) or empty($_POST["bl"])) {?>
-
-        <div class="alertes">Les Champs sont vides</div><?php
-
-      }else{
-        $numdec = $DB->querys('SELECT max(id) AS id FROM editionfournisseur');
-        $numdec=$numdec['id']+1;
-
-        $montant=$panier->h($_POST['montant']);
-        $bl=$panier->h($_POST['bl']);
-        $nature=$panier->h($_POST['nature']);
-        $devise=$panier->h($_POST['devise']);
-        $client=$panier->h($_POST['client']);
-        $motif=$panier->h($_POST['motif']);
-        $taux=1;
-
-        $lieuventeret=$_SESSION['lieuvente']; 
-        $dateop=$_POST['datedep'];
-
-        $numdec='editf'.$numdec;        
-
-        $prodverif = $DB->querys("SELECT id FROM editionfournisseur where bl='{$bl}' ");
-
-        if (!empty($prodverif['id'])) {?>
-
-          <div class="alertes">Ce numero BL existe dejà!!!</div><?php
-          
-        }else{
-
-          if(isset($_POST["env"])){
-            require "uploadf.php";
-          }
-
-          if (empty($dateop)) {
-
-            $DB->insert('INSERT INTO editionfournisseur (numedit, id_client, montant, bl, nature, libelle, devise, lieuvente, dateop) VALUES(?, ?, ?, ?, ?, ?, ?, ?, now())', array($numdec, $client, $montant, $bl, $nature, $motif, $devise, $lieuventeret));
-
-            $DB->insert('INSERT INTO bulletin (nom_client, montant, libelles, numero, devise, caissebul, lieuvente, date_versement) VALUES(?, ?, ?, ?, ?, ?, ?, now())', array($client, $montant, $motif, $numdec, $devise, 1, $lieuventeret));
-
-          }else{ 
-
-            $DB->insert('INSERT INTO editionfournisseur (numedit, id_client, montant, bl, nature, libelle, devise, lieuvente, dateop) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', array($numdec, $client, $montant, $bl, $nature, $motif, $devise, $lieuventeret, $dateop));
-
-            $DB->insert('INSERT INTO bulletin (nom_client, montant, libelles, numero, devise, caissebul, lieuvente, date_versement) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', array($client, $montant, $motif, $numdec, $devise, 1, $lieuventeret, $dateop));
+              $_SESSION['date01']=$_POST['j1'];
+              $_SESSION['date1'] = new DateTime($_SESSION['date01']);
+              $_SESSION['date1'] = $_SESSION['date1']->format('Ymd');
               
+              $_SESSION['date02']=$_POST['j2'];
+              $_SESSION['date2'] = new DateTime($_SESSION['date02']);
+              $_SESSION['date2'] = $_SESSION['date2']->format('Ymd');
+
+              $_SESSION['dates1']=(new DateTime($_SESSION['date01']))->format('d/m/Y');
+              $_SESSION['dates2']=(new DateTime($_SESSION['date02']))->format('d/m/Y');  
+            }
           }
-          unset($_POST);
-          unset($_GET);
-          unset($_SESSION['searchclientvers']);
-          ?>
 
-          <div class="alerteV">Facture enregistrée avec succèe dans le compte selectionné!!!</div><?php 
-        }
+          if (isset($_POST['j2'])) {
 
-      }
+            $datenormale='entre le '.$_SESSION['dates1'].' et le '.$_SESSION['dates2'];
 
-    }else{
+          }else{
 
-      
-    }
+            $datenormale=(new DateTime($_SESSION['date']))->format('d/m/Y');
+          }
 
-    if (isset($_GET['searchclientvers']) ) {
+          if (isset($_POST['clientliv'])) {
+            $_SESSION['clientliv']=$_POST['clientliv'];
+          }
 
-        $_SESSION['searchclientvers']=$_GET['searchclientvers'];
-    }
 
-    if (isset($_GET['ajout']) or isset($_GET['searchclientvers'])) {?>
+          if (isset($_GET['deleteret'])) {
 
-      <form id="naissance" method="POST" action="editionfacturefournisseur.php" enctype="multipart/form-data" style="margin-top: 0px; width:90%; margin-top:1px;" >
+            $DB->delete("DELETE from editionfournisseur where numedit='{$_GET['deleteret']}'");
 
-        <fieldset style="margin-top:-30px;">
-          <ol>          
-            <li><label>Fournisseur*</label>
-              <select type="text" name="client"><?php 
+            $DB->delete("DELETE from bulletin where numero='{$_GET['deleteret']}'");?>
 
-                if (!empty($_SESSION['searchclientvers'])) {?>
+            <div class="alert alert-success">Suppression reussie!!</div><?php 
+          }
 
-                    <option value="<?=$_SESSION['searchclientvers'];?>"><?=$panier->nomClient($_SESSION['searchclientvers']);?></option><?php
-                }else{?>
-                    <option></option><?php 
+
+          if (isset($_POST["valid"])) {
+
+            if (empty($_POST["client"]) or empty($_POST["montant"])) {?>
+
+              <div class="alert alert-warning">Les Champs sont vides</div><?php
+
+            }else{
+              $numdec = $DB->querys('SELECT max(id) AS id FROM editionfournisseur');
+              $numdec=$numdec['id']+1;
+
+              $montant=$panier->h($_POST['montant']);
+              $bl=$panier->h($_POST['bl']);
+              $nature=$panier->h($_POST['nature']);
+              $devise=$panier->h($_POST['devise']);
+              $client=$panier->h($_POST['client']);
+              $motif=$panier->h($_POST['motif']);
+              $taux=1;
+
+              $lieuventeret=$_SESSION['lieuvente']; 
+              $dateop=$_POST['datedep'];
+
+              $numdec='editf'.$numdec;        
+
+              $prodverif = $DB->querys("SELECT id FROM editionfournisseur where bl='{$bl}' ");
+
+              if (!empty($prodverif['id'])) {?>
+
+                <div class="alert alert-warning">Ce numero BL existe dejà!!!</div><?php
+                
+              }else{
+
+                if(isset($_POST["env"])){
+                  require "uploadf.php";
                 }
 
-                $type1='fournisseur';
-                $type2='fournisseur';
+                $logo=$_FILES['photo']['name'];
 
-                foreach($panier->clientF($type1, $type2) as $product){?>
-                  <option value="<?=$product->id;?>"><?=$product->nom_client;?></option><?php
-                }?>
-              </select>
+                if($logo!=""){
 
-              <div style="color:white; background-color: black; font-size: 16px; margin-left: 300px;" id="result-search"></div>
-            </li>
-            <li><label>N° BL/Numero*</label><input type="text"   name="bl" required=""></li>
+                  require "uploadImage.php";
+                
+                }
 
-            <li><label>Nature*</label><input type="text"   name="nature" required="" placeholder="achat yaourt"></li>
+                if (empty($dateop)) {
 
-            <li><label>Libellé de la Facture*</label><input type="text"   name="motif" required=""></li>
+                  $DB->insert('INSERT INTO editionfournisseur (numedit, id_client, montant, bl, nature, libelle, devise, lieuvente, dateop) VALUES(?, ?, ?, ?, ?, ?, ?, ?, now())', array($numdec, $client, $montant, $bl, $nature, $motif, $devise, $lieuventeret));
 
-            <div style="display: flex;">
-              <div style="width: 50%;">
+                  $DB->insert('INSERT INTO bulletin (nom_client, montant, libelles, numero, devise, caissebul, lieuvente, date_versement) VALUES(?, ?, ?, ?, ?, ?, ?, now())', array($client, $montant, $motif, $numdec, $devise, 1, $lieuventeret));
 
-                <li><label>Montant*</label><input id="numberconvert" type="number"   name="montant" min="0" required="" style="font-size: 25px; width: 50%;"></li>
-              </div>
+                }else{ 
 
-              <li style="width:50%;"><label style="width:50%;"><div style="color:white; background-color: grey; font-size: 25px; color: orange; width:100%;" id="convertnumber"></div></li></label>
-            </div>
+                  $DB->insert('INSERT INTO editionfournisseur (numedit, id_client, montant, bl, nature, libelle, devise, lieuvente, dateop) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', array($numdec, $client, $montant, $bl, $nature, $motif, $devise, $lieuventeret, $dateop));
 
-            <li><label>Devise*</label>
-              <select name="devise" required="" ><?php 
-                foreach ($panier->monnaie as $valuem) {?>
-                    <option value="<?=$valuem;?>"><?=strtoupper($valuem);?></option><?php 
-                }?>
-              </select>
-            </li>
+                  $DB->insert('INSERT INTO bulletin (nom_client, montant, libelles, numero, devise, caissebul, lieuvente, date_versement) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', array($client, $montant, $motif, $numdec, $devise, 1, $lieuventeret, $dateop));
+                    
+                }
+                unset($_POST);
+                unset($_GET);
+                unset($_SESSION['searchclientvers']);
+                ?>
 
-            <li><label>Joindre la facture</label>
-              <input type="file" name="just[]"multiple id="photo" />
-              <input type="hidden" value="b" name="env"/>
-            </li>
-            <li><label>Date de la Facture</label><input type="date" name="datedep"></li>
-          </ol>
-        </fieldset>
+                <div class="alert alert-success">Facture enregistrée avec succèe dans le compte selectionné!!!</div><?php 
+              }
 
-        <fieldset style="margin-top:-30px;"><?php
+            }
+
+          }else{
+
             
-          if (empty($panier->totalsaisie()) AND $panier->licence()!="expiree") {?>
-
-            <input id="form"  type="submit" name="valid" value="VALIDER" onclick="return alerteV();" style="margin-left: 20px; margin-top: -20px; width:150px; cursor: pointer;"><?php
-
-          }else{?>
-
-            <div class="alertes"> Journée cloturée ou la licence est expirée </div><?php
-
-          }?>
-        </fieldset> 
-      </form> <?php
-    }
-
-
-
-    if (isset($_GET['update'])) {
-
-      $prod = $DB->querys("SELECT *FROM editionfournisseur where numedit='{$_GET['update']}' ");
-
-      $datefacture=(new dateTime($prod['dateop']))->format("Y-m-d");?>
-
-      <form id="naissance" method="POST" action="editionfacturefournisseur.php" enctype="multipart/form-data" style="margin-top: 0px; width:90%; margin-top:1px;" >
-
-        <fieldset style="margin-top:-30px;">
-          <ol>          
-            <li><label>Fournisseur*</label>
-              <select type="text" name="client">
-                <option value="<?=$prod['id_client'];?>"><?=$panier->nomClient($prod['id_client']);?></option><?php
-
-                $type1='fournisseur';
-                $type2='fournisseur';
-
-                foreach($panier->clientF($type1, $type2) as $product){?>
-                  <option value="<?=$product->id;?>"><?=$product->nom_client;?></option><?php
-                }?>
-              </select>
-            </li>
-            <li><label>N° BL/Numero*</label>
-              <input type="text"   name="bl" value="<?=$prod['bl'];?>" required="">
-              <input type="hidden"   name="blinit" value="<?=$prod['bl'];?>">
-              <input type="hidden"   name="numedit" value="<?=$prod['numedit'];?>">
-            </li>
-
-            <li><label>Nature*</label><input type="text"   name="nature" value="<?=$prod['nature'];?>" required="" placeholder="par exemple oignon jaune"></li>
-
-            <li><label>Libellé de la Facture*</label><input type="text" value="<?=$prod['libelle'];?>"  name="motif" required=""></li>
-
-            <div style="display: flex;">
-              <div style="width: 50%;">
-
-                <li><label>Montant*</label><input id="numberconvert" type="number"   name="montant" value="<?=$prod['montant'];?>" min="0" required="" style="font-size: 25px; width: 50%;"></li>
-              </div>
-
-              <li style="width:50%;"><label style="width:50%;"><div style="color:white; background-color: grey; font-size: 25px; color: orange; width:100%;" id="convertnumber"></div></li></label>
-            </div>
-
-            <li><label>Devise*</label>
-              <select name="devise" required="" >
-                <option value="<?=$prod['devise'];?>"><?=$prod['devise'];?></option><?php 
-                foreach ($panier->monnaie as $valuem) {?>
-                    <option value="<?=$valuem;?>"><?=strtoupper($valuem);?></option><?php 
-                }?>
-              </select>
-            </li>
-
-            <li><label>Joindre la facture</label>
-              <input type="file" name="just[]"multiple id="photo" />
-              <input type="hidden" value="b" name="env"/>
-            </li>
-            <li><label>Date de la Facture</label><input type="date" name="datedep" value="<?=$datefacture;?>" ></li>
-          </ol>
-        </fieldset>
-
-        <fieldset style="margin-top:-30px;"><?php
-            
-          if (empty($panier->totalsaisie()) AND $panier->licence()!="expiree") {?>
-
-            <input id="form"  type="submit" name="validup" value="VALIDER" onclick="return alerteV();" style="margin-left: 20px; margin-top: -20px; width:150px; cursor: pointer;"><?php
-
-          }else{?>
-
-            <div class="alertes"> Journée cloturée ou la licence est expirée </div><?php
-
-          }?>
-        </fieldset> 
-      </form> <?php
-    }
-
-
-    if (isset($_POST["validup"])) {
-
-      if (empty($_POST["client"]) or empty($_POST["montant"])) {?>
-
-        <div class="alertes">Les Champs sont vides</div><?php
-
-      }else{
-
-        $numdec=$panier->h($_POST['numedit']);
-        $blinit=$panier->h($_POST['blinit']);
-        $montant=$panier->h($_POST['montant']);
-        $bl=$panier->h($_POST['bl']);
-        $nature=$panier->h($_POST['nature']);
-        $devise=$panier->h($_POST['devise']);
-        $client=$panier->h($_POST['client']);
-        $motif=$panier->h($_POST['motif']);
-        $taux=1;
-
-        $lieuventeret=$_SESSION['lieuvente']; 
-        $dateop=$_POST['datedep']; 
-
-        if ($bl==$blinit) {
-
-          $DB->delete("DELETE from editionfournisseur where numedit='{$numdec}'");
-
-          $DB->delete("DELETE from bulletin where numero='{$numdec}'");
-
-          $DB->insert("UPDATE stockmouv SET coment= ? WHERE coment = ?", array($bl, $blinit)); 
-        }    
-
-        $prodverif = $DB->querys("SELECT id FROM editionfournisseur where bl='{$bl}' ");
-
-        if (!empty($prodverif['id'])) {?>
-
-          <div class="alertes">Ce numero BL existe dejà!!!</div><?php
-          
-        }else{ 
-
-          $DB->delete("DELETE from editionfournisseur where numedit='{$numdec}'");
-
-          $DB->delete("DELETE from bulletin where numero='{$numdec}'");
-
-          $DB->insert("UPDATE stockmouv SET coment= ? WHERE coment = ?", array($bl, $blinit));         
-
-          if(isset($_POST["env"])){
-            require "uploadf.php";
           }
 
-          if (empty($dateop)) {
+          if (isset($_GET['searchclientvers']) ) {
 
-            $DB->insert('INSERT INTO editionfournisseur (numedit, id_client, montant, bl, nature, libelle, devise, lieuvente, dateop) VALUES(?, ?, ?, ?, ?, ?, ?, ?, now())', array($numdec, $client, $montant, $bl, $nature, $motif, $devise, $lieuventeret));
-
-            $DB->insert('INSERT INTO bulletin (nom_client, montant, libelles, numero, devise, caissebul, lieuvente, date_versement) VALUES(?, ?, ?, ?, ?, ?, ?, now())', array($client, $montant, $motif, $numdec, $devise, 1, $lieuventeret));
-
-          }else{ 
-
-            $DB->insert('INSERT INTO editionfournisseur (numedit, id_client, montant, bl, nature, libelle, devise, lieuvente, dateop) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', array($numdec, $client, $montant, $bl, $nature, $motif, $devise, $lieuventeret, $dateop));
-
-            $DB->insert('INSERT INTO bulletin (nom_client, montant, libelles, numero, devise, caissebul, lieuvente, date_versement) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', array($client, $montant, $motif, $numdec, $devise, 1, $lieuventeret, $dateop));
-              
+              $_SESSION['searchclientvers']=$_GET['searchclientvers'];
           }
-          unset($_POST);
-          unset($_GET);
-          unset($_SESSION['searchclientvers']);
-          ?>
 
-          <div class="alerteV">Facture modifiée avec succèe dans le compte selectionné!!!</div><?php 
-        }
+          if (isset($_GET['ajout']) or isset($_GET['searchclientvers'])) {?>
+              <form class="form my-2" method="POST" enctype="multipart/form-data">
 
-      }
+                  <fieldset>
 
-    }else{
+                  <div class="row mb-1">
+                      <div class="col-sm-12 col-md-6">
 
-      
-    }
+                          <label class="form-label">Fournisseur*</label>
+                          <select class="form-select" type="text" name="client"><?php 
 
+                          if (!empty($_SESSION['searchclientvers'])) {?>
 
-    if (!isset($_GET['ajout'])) {?>
-
-      <div style="overflow: auto">
-
-        <table class="payement">
-
-          <thead>
-            <tr><th class="legende" colspan="15" height="30"><?="factures fournisseurs";?> <a href="editionfacturefournisseur.php?ajout" style="color:orange; font-size: 25px;">Saisir une Facture Fournisseur</a></th></tr>
-
-            <tr>
-              <th>N°</th>
-              <th>Facture</th>
-              <th>Date</th>
-              <th>N°BL</th>
-              <th>libelle</th> 
-              <th>Nature</th>
-              <th>Collaborateur</th>                             
-              <th>GNF</th>
-              <th>$</th>
-              <th>€</th>
-              <th>CFA</th>
-              <th colspan="3">Actions</th>
-            </tr>
-
-          </thead>
-
-          <tbody><?php 
-
-            if ($_SESSION['level']>6) {
-              $products= $DB->query("SELECT *FROM editionfournisseur  order by(id)");
-            }else{
-              $products= $DB->query("SELECT *FROM editionfournisseur  WHERE lieuvente='{$_SESSION['lieuvente']}' ");
-            }   
-
-            $montantgnf=0;
-            $montanteu=0;
-            $montantus=0;
-            $montantcfa=0;
-            $virement=0;
-            $cheque=0;
-            foreach ($products as $keyv=> $product ){
-
-              $prodverif= $DB->querys("SELECT *FROM stockmouv  WHERE coment='{$product->bl}' ");?>
-
-              <tr>
-                <td style="text-align: center;"><?= $keyv+1; ?></td>
-
-                <td style="text-align: center"><?php
-                  $num='fact'.$product->numedit;
-                  $nom_dossier="editfacturef/".'fact'.$product->numedit."/";
-                  if (file_exists($nom_dossier)) {
-
-                      $dossier=opendir($nom_dossier);
-                      while ($fichier=readdir($dossier)) {
-
-                          if ($fichier!='.' && $fichier!='..') {?>
-
-                              <a href="editfacturef/<?='fact'.$product->numedit;?>/<?=$fichier;?>" target="_blank"><img  style="height: 20px; width: 20px;" src="css/img/pdf.jpg"></a><?php
+                              <option value="<?=$_SESSION['searchclientvers'];?>"><?=$panier->nomClient($_SESSION['searchclientvers']);?></option><?php
+                          }else{?>
+                              <option></option><?php 
                           }
-                      }closedir($dossier);
-                  }?>
-                </td>
-                <td style="text-align:center;"><?=(new DateTime($product->dateop))->format("d/m/Y"); ?></td>
-                <td><?= strtoupper($product->bl); ?></td>
-                <td><?=$product->libelle; ?></td>
-                <td><?=$product->nature; ?></td>
-                <td><?=strtoupper($panier->nomClient($product->id_client)); ?></td><?php
 
-                if ($product->devise=='gnf') {
+                          $type1='fournisseur';
+                          $type2='clientf';
 
-                  $montantgnf+=$product->montant;?>
+                          foreach($panier->clientF($type1, $type2) as $product){?>
+                              <option value="<?=$product->id;?>"><?=$product->nom_client;?></option><?php
+                          }?>
+                          </select>
+                      </div>
+                      <div class="col-sm-12 col-md-4">
 
-                  <td style="text-align: right; padding-right: 10px;"><?= number_format($product->montant,0,',',' '); ?></td>
+                          <label class="form-label">N°BL/Numero*</label>
+                          <input class="form-control" type="text"   name="bl" required="">
+                      </div>
+                  </div>
 
-                  <td></td>
-                  <td></td>
-                  <td></td><?php
+                  <div class="row mb-1">
 
-                  }elseif ($product->devise=='us') {
-                    $montantus+=$product->montant;?>
+                      <div class="col-sm-12 col-md-4">
+                          <label class="form-label">Nature*</label>
+                          <input class="form-control" type="text" value="achat"  name="nature" required="" placeholder="nom des produits">
 
-                    <td></td>
-                    <td style="text-align: right; padding-right: 10px;"><?= number_format($product->montant,0,',',' '); ?></td>
-                    <td></td>
-                    <td></td><?php
-                  }elseif ($product->devise=='eu') {
-                    $montanteu+=$product->montant;?>
+                          <input class="form-control" type="hidden" value="achat"  name="nature" required="" placeholder="nom des produits">
+                      </div>
 
-                    <td></td>
-                    <td></td>
-                    <td style="text-align: right; padding-right: 10px;"><?= number_format($product->montant,0,',',' '); ?></td>
-                    <td></td><?php
-                  }elseif ($product->devise=='cfa') {
-                    $montantcfa+=$product->montant;?>
+                      <div class="col-sm-12 col-md-4">
+                          <label class="form-label">Libellé de la Facture*</label>
+                          <input class="form-control" type="text"   name="motif" required="">
+                      </div>
+                      <div class="col-sm-12 col-md-4">
+                      <label class="form-label">Devise*</label>
+                      <select class="form-select" name="devise" required="" ><?php 
+                          foreach ($panier->monnaie as $valuem) {?>
+                              <option value="<?=$valuem;?>"><?=strtoupper($valuem);?></option><?php 
+                          }?>
+                      </select>
+                  </div>
+                  </div>
 
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td style="text-align: right; padding-right: 10px;"><?= number_format($product->montant,0,',',' '); ?></td><?php
+                  <div class="mb-1"><label class="form-label">Montant*</label>
 
-                  }?>
+                      <div class="container-fluid px-0 mb-1">
+                          <div class="row">
+                          <div class="col-sm-12 col-md-6">
+                              <input class="form-control" id="numberconvert" type="number"   name="montant" value="0" min="0" required="">
+                          </div>
 
-                  <td><?php if ($_SESSION['level']>=1){?><a href="editionreceptionf.php?reception=<?=$product->numedit;?>&bl=<?=$product->bl;?>&idclient=<?=$product->id_client;?>&datef=<?=$product->dateop;?>"> <input style="width: 100%;height: 30px; font-size: 17px; background-color: green;color: white; cursor: pointer;"  type="submit" value="Receptionner" onclick="return alerteV();"></a><?php };?></td>
+                          <div class="col-sm-12 col-md-6">
+                              <div class="text-danger fw-bold fs-4" id="convertnumber"></div>
+                          </div>
+                          </div>
+                      </div>
+                  </div>
 
-                  <td><?php if ($_SESSION['level']>=6 ){?><a href="editionfacturefournisseur.php?update=<?=$product->numedit;?>"> <input style="width: 100%;height: 30px; font-size: 17px; background-color: orange;color: white; cursor: pointer;"  type="submit" value="Modifier" onclick="return alerteV();"></a><?php };?></td>
-
-                  <td><?php if ($_SESSION['level']>=6 and empty($prodverif['id'])){?><a href="editionfacturefournisseur.php?deleteret=<?=$product->numedit;?>"> <input style="width: 100%;height: 30px; font-size: 17px; background-color: red;color: white; cursor: pointer;"  type="submit" value="Supprimer" onclick="return alerteS();"></a><?php };?></td>
+                  <div class="row mb-1">
+                      <div class="col-sm-12 col-md-4">
+                          <label class="form-label">Joindre la facture</label>
+                          <input class="form-control" type="file" name="just[]"multiple id="photo" />
+                          <input class="form-control" type="hidden" value="b" name="env"/>
+                      </div>
+                      <div class="col-sm-12 col-md-4">
+                          <label class="form-label">Joindre Photo</label>
+                          <input class="form-control" type="file" name="photo" id="photo" />
+                          <input type="hidden" value="b" name="env"/>
+                      </div>
+                      <div class="col-sm-12 col-md-4">
+                          <label class="form-label">Date de la Facture</label>
+                          <input class="form-control" type="date" name="datedep">
+                      </div>
+                  </div>
                   
-                </tr><?php 
-            }?>
+                  <button class="btn btn-primary"  type="submit" name="valid" onclick="return alerteV();">Valider</button>
+              </form><?php
+          }
 
-            </tbody>
+          if (isset($_POST["validup"])) {
 
-            <tfoot>
-              <tr>
-                <th colspan="7">Totaux</th>
-                <th style="text-align: right; padding-right: 10px;"><?= number_format($montantgnf,0,',',' ');?></th>
-                <th style="text-align: right; padding-right: 10px;"><?= number_format($montantus,0,',',' ');?></th>
-                <th style="text-align: right; padding-right: 10px;"><?= number_format($montanteu,0,',',' ');?></th>
-                <th style="text-align: right; padding-right: 10px;"><?= number_format($montantcfa,0,',',' ');?></th>
-              </tr>
-            </tfoot>
+              if (empty($_POST["client"]) or empty($_POST["montant"])) {?>
+        
+                <div class="alert alert-warning">Les Champs sont vides</div><?php
+        
+              }else{
+        
+                $numdec=$panier->h($_POST['numedit']);
+                $blinit=$panier->h($_POST['blinit']);
+                $montant=$panier->h($_POST['montant']);
+                $bl=$panier->h($_POST['bl']);
+                $nature=$panier->h($_POST['nature']);
+                $devise=$panier->h($_POST['devise']);
+                $client=$panier->h($_POST['client']);
+                $motif=$panier->h($_POST['motif']);
+                $taux=1;
+        
+                $lieuventeret=$_SESSION['lieuvente']; 
+                $dateop=$_POST['datedep']; 
+        
+                if ($bl==$blinit) {
+        
+                  $DB->delete("DELETE from editionfournisseur where numedit='{$numdec}'");
+        
+                  $DB->delete("DELETE from bulletin where numero='{$numdec}'");
+        
+                  $DB->insert("UPDATE stockmouv SET coment= ? WHERE coment = ?", array($bl, $blinit)); 
+                }    
+        
+                $prodverif = $DB->querys("SELECT id FROM editionfournisseur where bl='{$bl}' ");
+        
+                  if (!empty($prodverif['id'])) {?>
+        
+                      <div class="alert alert-warning">Ce numero BL existe dejà!!!</div><?php
+                  
+                  }else{ 
+        
+                      $DB->delete("DELETE from editionfournisseur where numedit='{$numdec}'");
+          
+                      $DB->delete("DELETE from bulletin where numero='{$numdec}'");
+          
+                      $DB->insert("UPDATE stockmouv SET coment= ? WHERE coment = ?", array($bl, $blinit));         
+          
+                      if(isset($_POST["env"])){
+                      require "uploadf.php";
+                      }
+          
+                      $logo=$_FILES['photo']['name'];
+          
+                      if($logo!=""){
+          
+                      require "uploadImage.php";
+                      
+                      }
+        
+                      if (empty($dateop)) {
+          
+                          $DB->insert('INSERT INTO editionfournisseur (numedit, id_client, montant, bl, nature, libelle, devise, lieuvente, dateop) VALUES(?, ?, ?, ?, ?, ?, ?, ?, now())', array($numdec, $client, $montant, $bl, $nature, $motif, $devise, $lieuventeret));
+              
+                          $DB->insert('INSERT INTO bulletin (nom_client, montant, libelles, numero, devise, caissebul, lieuvente, date_versement) VALUES(?, ?, ?, ?, ?, ?, ?, now())', array($client, $montant, $motif, $numdec, $devise, 1, $lieuventeret));
+              
+                      }else{ 
+          
+                          $DB->insert('INSERT INTO editionfournisseur (numedit, id_client, montant, bl, nature, libelle, devise, lieuvente, dateop) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', array($numdec, $client, $montant, $bl, $nature, $motif, $devise, $lieuventeret, $dateop));
+              
+                          $DB->insert('INSERT INTO bulletin (nom_client, montant, libelles, numero, devise, caissebul, lieuvente, date_versement) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', array($client, $montant, $motif, $numdec, $devise, 1, $lieuventeret, $dateop));
+                          
+                      }
+                      unset($_POST);
+                      unset($_GET);
+                      unset($_SESSION['searchclientvers']);
+                      ?>
+        
+                      <div class="alert alert-success">Facture modifiée avec succèe dans le compte selectionné!!!</div><?php 
+                  }
+        
+              }
+        
+          }
 
-          </table>
-        </div><?php 
-      }
+          if (isset($_GET['update'])) {
 
-      
+            $prod = $DB->querys("SELECT *FROM editionfournisseur where numedit='{$_GET['update']}' ");
 
-    }else{
+            $datefacture=(new dateTime($prod['dateop']))->format("Y-m-d");?>
+              <form class="form my-2" method="POST" enctype="multipart/form-data">
+                  <div class="row mb-1">
+                      <div class="col-sm-12 col-md-6">
 
-      echo "VOUS N'AVEZ PAS LES AUTORISATIONS REQUISES";
+                          <label class="form-label">Fournisseur*</label>
+                          <select class="form-select" type="text" name="client">
+                          <option value="<?=$prod['id_client'];?>"><?=$panier->nomClient($prod['id_client']);?></option><?php 
 
-    }
+                          if (!empty($_SESSION['searchclientvers'])) {?>
 
-  }else{
+                              <option value="<?=$_SESSION['searchclientvers'];?>"><?=$panier->nomClient($_SESSION['searchclientvers']);?></option><?php
+                          }else{?>
+                              <option></option><?php 
+                          }
 
-  }?>
+                          $type1='fournisseur';
+                          $type2='clientf';
+
+                          foreach($panier->clientF($type1, $type2) as $product){?>
+                              <option value="<?=$product->id;?>"><?=$product->nom_client;?></option><?php
+                          }?>
+                          </select>
+                      </div>
+                      <div class="col-sm-12 col-md-4">
+
+                          <label class="form-label">N°BL/Numero*</label>
+                          <input class="form-control" type="text"   name="bl" value="<?=$prod['bl'];?>" required="">
+                          <input type="hidden"   name="blinit" value="<?=$prod['bl'];?>">
+                          <input type="hidden"   name="numedit" value="<?=$prod['numedit'];?>">
+                      </div>
+                  </div>
+
+                  <div class="row mb-1">
+                      <input class="form-control" type="hidden" value="achat"  name="nature" value="<?=$prod['nature'];?>" required="" placeholder="nom des produits">
+
+                      <div class="col-sm-12 col-md-4">
+                          <label class="form-label">Libellé de la Facture*</label>
+                          <input class="form-control" type="text"   name="motif" value="<?=$prod['libelle'];?>"  required="">
+                      </div>
+                      <div class="col-sm-12 col-md-4">
+                      <label class="form-label">Devise*</label>
+                      <select class="form-select" name="devise" required="" >
+                          <option value="<?=$prod['devise'];?>"><?=$prod['devise'];?></option><?php 
+                          foreach ($panier->monnaie as $valuem) {?>
+                              <option value="<?=$valuem;?>"><?=strtoupper($valuem);?></option><?php 
+                          }?>
+                      </select>
+                  </div>
+                  </div>
+
+                  <div class="mb-1"><label class="form-label">Montant*</label>
+
+                      <div class="container-fluid px-0 mb-1">
+                          <div class="row">
+                          <div class="col-sm-12 col-md-6">
+                              <input class="form-control" id="numberconvert" type="number"   name="montant" value="<?=$prod['montant'];?>" value="0" min="0" required="">
+                          </div>
+
+                          <div class="col-sm-12 col-md-6">
+                              <div class="text-danger fw-bold fs-4" id="convertnumber"></div>
+                          </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="row mb-1">
+                      <div class="col-sm-12 col-md-4">
+                          <label class="form-label">Joindre la facture</label>
+                          <input class="form-control" type="file" name="just[]"multiple id="photo" />
+                          <input class="form-control" type="hidden" value="b" name="env"/>
+                      </div>
+                      <div class="col-sm-12 col-md-4">
+                          <label class="form-label">Joindre Photo</label>
+                          <input class="form-control" type="file" name="photo" id="photo" />
+                          <input type="hidden" value="b" name="env"/>
+                      </div>
+                  
+                      <div class="col-sm-12 col-md-4">
+                          <label class="form-label">Date de la Facture</label>
+                          <input class="form-control" type="date" name="datedep">
+                      </div>
+                  </div>
+
+                  <button class="btn btn-primary"  type="submit" name="validup" onclick="return alerteV();">Valider</button>
+              </form><?php
+          }
+
+          if (!isset($_GET['ajout'])) {?>
+
+            <div class="row"  style="overflow: auto;">
+
+              <table class="table table-hover table-bordered table-striped table-responsive text-center align-middle">
+                <thead class="sticky-top bg-secondary text-center">
+                  <tr>
+                    <th colspan="15"><?="factures fournisseurs";?>
+                      <div class="d-flex justify-content-around"><?php 
+                        if ($user['statut'] != 'superviseur') {?>
+                        <a class="btn btn-warning" href="?ajout">Saisir une Facture Fournisseur</a><?php } ?>
+                        <form class="d-flex" method="get">
+                          <input type="text" name="search" onchange="this.form.submit()" class="form-control">
+                          <button class="btn btn-primary" type="submit">Rechercher</button>
+
+                        </form>
+                      </div>
+                    </th>
+                  </tr>
+
+                  <tr>
+                    <th>N°</th>
+                    <th>Facture</th>
+                    <th>Date</th>
+                    <th>N°BL</th>
+                    <th>libelle</th> 
+                    <th>Nature</th>
+                    <th>Collaborateur</th>                             
+                    <th>Montant</th>
+                    <th>Devise</th><?php 
+                    if ($user['statut'] != 'superviseur') {?>
+                      <th colspan="3">Actions</th><?php } ?>
+                  </tr>
+
+                </thead>
+
+                <tbody><?php
+                  if (isset($_GET['search'])) {
+                    $terme = htmlspecialchars($_GET["search"]);
+                    $products= $DB->query("SELECT *FROM editionfournisseur inner join client on id_client=client.id  WHERE (nom_client LIKE ? OR telephone LIKE ? OR bl LIKE ? ) and  lieuvente LIKE ? order by(editionfournisseur.id) DESC ", array("%".$terme."%", "%".$terme."%", "%".$terme."%", $_SESSION['lieuvente']));
+                  }else{ 
+
+                    if ($_SESSION['level']>6) {
+                      $products= $DB->query("SELECT *FROM editionfournisseur  order by(id) DESC");
+                    }else{
+                      $products= $DB->query("SELECT *FROM editionfournisseur  WHERE lieuvente='{$_SESSION['lieuvente']}' order by(id) DESC ");
+                    } 
+                  }  
+
+                  $montantgnf=0;
+                  $montanteu=0;
+                  $montantus=0;
+                  $montantcfa=0;
+                  $virement=0;
+                  $cheque=0;
+                  foreach ($products as $keyv=> $product ){
+
+                    $prodverif= $DB->querys("SELECT *FROM stockmouv  WHERE coment='{$product->bl}' ");?>
+
+                    <tr>
+                      <td><?= $keyv+1; ?></td>
+                      <td>
+                        <a target="_blank" href="printcmdachat.php?print=<?=$product->bl;?>&client=<?=$product->id_client;?>&lieuvente=<?=$product->lieuvente;?>"><i class="fa-solid fa-file-pdf fs-4"></i></a><?php
+                        $num='fact'.$product->numedit;
+                        $nom_dossier="editfacturef/".'fact'.$product->numedit."/";
+                        if (file_exists($nom_dossier)) {
+
+                            $dossier=opendir($nom_dossier);
+                            while ($fichier=readdir($dossier)) {
+
+                                if ($fichier!='.' && $fichier!='..') {?>
+
+                                    <a href="editfacturef/<?='fact'.$product->numedit;?>/<?=$fichier;?>" target="_blank"><img  style="height: 20px; width: 20px;" src="css/img/pdf.jpg"></a><?php
+                                }
+                            }closedir($dossier);
+                        }?>
+                      </td>
+                      <td><?=(new DateTime($product->dateop))->format("d/m/Y"); ?></td>
+                      <td><?= strtoupper($product->bl); ?></td>
+                      <td class="text-start"><?=$product->libelle; ?></td>
+                      <td class="text-start"><?=$product->nature; ?></td>
+                      <td class="text-start"><?=strtoupper($panier->nomClient($product->id_client)); ?></td><?php
+
+                      $montantgnf+=$product->montant;?>
+
+                      <td class="text-end"><?= number_format($product->montant,0,',',' '); ?></td>
+                      <td><?=$product->devise;?></td><?php 
+                    if ($user['statut'] != 'superviseur') {?>
+                      <td><?php if ($_SESSION['level']>=1){?><a onclick="return alerteV();" class="btn btn-success" href="editionreceptionf.php?reception=<?=$product->numedit;?>&bl=<?=$product->bl;?>&idclient=<?=$product->id_client;?>&datef=<?=$product->dateop;?>">Receptionner</a><?php };?></td>
+
+                      <td><?php if ($_SESSION['level']>=6 ){?><a class="btn btn-warning" onclick="return alerteV();" href="?update=<?=$product->numedit;?>">Modifier</a><?php };?></td>
+
+                      <td><?php if ($_SESSION['level']>=6 and empty($prodverif['id'])){?><a class="btn btn-danger" onclick="return alerteS();" href="?deleteret=<?=$product->numedit;?>">Annuler</a><?php };?></td> <?php } ?>
+                      
+                    </tr><?php 
+                  }?>
+
+                </tbody>
+
+                <!-- <tfoot>
+                  <tr>
+                    <th colspan="7">Totaux</th>
+                    <th class="text-end"><?= number_format($montantgnf,0,',',' ');?></th>
+                    <th class="text-end"><?= number_format($montantus,0,',',' ');?></th>
+                    <th class="text-end"><?= number_format($montanteu,0,',',' ');?></th>
+                    <th class="text-end"><?= number_format($montantcfa,0,',',' ');?></th>
+                  </tr>
+                </tfoot> -->
+
+              </table>
+            </div><?php 
+          }
+
+            
+
+        }else{
+
+          echo "VOUS N'AVEZ PAS LES AUTORISATIONS REQUISES";
+
+        }?>
+      </div>
+    </div>
+  </div><?php
+
+}else{
+
+}?>
     
 </body>
 
